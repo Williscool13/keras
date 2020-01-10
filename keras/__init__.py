@@ -17,6 +17,7 @@ from . import models
 from . import losses
 from . import optimizers
 from . import regularizers
+from . import gui
 
 # Also importable from root
 from .layers import Input

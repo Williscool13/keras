@@ -11,6 +11,11 @@ from .utils.generic_utils import deserialize_keras_object
 from .engine import Layer
 
 
+
+def test(x):
+    return x + 1
+
+
 def softmax(x, axis=-1):
     """Softmax activation function.
 
