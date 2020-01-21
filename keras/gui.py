@@ -2,7 +2,11 @@ import tkinter as tk
 import time
 from .engine.input_layer import Input
 from .layers.convolutional import Conv1D, Conv2D, Conv3D, SeparableConv1D, SeparableConv2D, DepthwiseConv2D, Conv2DTranspose, Conv3DTranspose
-from .blocks import Inception
+from .blocks import Inception, Residual, VGG, SqueezeExcite
+from .models import Sequential
+
+
+INPUT_SHAPE = []
 GLOBAL_STRUCTURE = []
 
 class display:
@@ -29,12 +33,30 @@ class Blocks:
         self.master = master
         self.frame = tk.Frame(self.master)
 
-        tk.Button(self.frame, text='Inception',   command=self.inception).pack()
+        tk.Button(self.frame, text='Inception',             command=self.inception).pack()
+        tk.Button(self.frame, text='Residual',              command=self.residual).pack()
+        tk.Button(self.frame, text='VGG',                   command=self.VGG).pack()
+        tk.Button(self.frame, text='Squeeze and Excite',    command=self.squeezeexcite).pack()
         self.frame.pack()
 
 
     def inception(self):
-        GLOBAL_STRUCTURE.append(Inception)
+        #parameterized by channels
+        GLOBAL_STRUCTURE.append(Inception())
+
+    def residual(self):
+        #parameterized by channels
+        GLOBAL_STRUCTURE.append(Residual())
+        print('residual added')
+
+    def VGG(self):
+        #parameterized by channels and n-number multiplier of the block
+        GLOBAL_STRUCTURE.append(VGG())
+        print('VGG added')
+
+    def squeezeexcite(self):
+        GLOBAL_STRUCTURE.append(SqueezeExcite())
+        print('sne added')
 
 
 class Primitives:
@@ -167,16 +189,21 @@ class conv_window:
 
         padding = self.padding_value.get()
         commands = {
-        'Conv1D': Conv1D(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'Conv2D': Conv2D(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'Conv3D': Conv3D(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'SepConv1D': SeparableConv1D(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'SepConv2D': SeparableConv1D(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'Conv2DTrans': Conv2DTranspose(filters=filter, kernel_size=kernel, strides=stride, padding=padding),
-        'Conv3DTrans': Conv3DTranspose(filters=filter, kernel_size=kernel, strides=stride, padding=padding)
+        'Conv1D': Conv1D,
+        'Conv2D': Conv2D,
+        'Conv3D': Conv3D,
+        'SepConv1D': SeparableConv1D,
+        'SepConv2D': SeparableConv1D,
+        'Conv2DTrans': Conv2DTranspose,
+        'Conv3DTrans': Conv3DTranspose
         }
 
-        op = commands[self.type] #Conv2D(filters=filter, kernel_size=kernel, strides=stride, padding=padding)
+        #Conv2D(filters=filter, kernel_size=kernel, strides=stride, padding=padding)
+        print(INPUT_SHAPE)
+        if not GLOBAL_STRUCTURE:
+            op = commands[self.type](filters=filter, kernel_size=kernel, strides=stride, padding=padding, input_shape=INPUT_SHAPE[0])
+        else:
+            op = commands[self.type](filters=filter, kernel_size=kernel, strides=stride, padding=padding)
         GLOBAL_STRUCTURE.append(op)
         tk.Label(self.temp, text='Input Successfully Saved').pack()
         self.temp.after(1500, self.master.destroy)
@@ -210,7 +237,7 @@ class input_window:
 
     def get_input(self):
         i = tuple([int(x.strip()) for x in self.input1.get().split(',')])
-        GLOBAL_STRUCTURE.append(Input(shape=i))
+        INPUT_SHAPE.append(i)
         self.button.destroy()
         self.label1.destroy()
         self.input1.destroy()
@@ -228,13 +255,13 @@ def main():
     root.mainloop()
 
 
+
+    print(GLOBAL_STRUCTURE)
     #create sequential model with GUI
+    model = Sequential()
     if len(GLOBAL_STRUCTURE) > 1:
-        x = GLOBAL_STRUCTURE[0]
-        for item in GLOBAL_STRUCTURE[1:-1]:
-            x = item(x)
-        y = GLOBAL_STRUCTURE[-1](x)
-        model = Model(x,y)
+        for item in GLOBAL_STRUCTURE:
+            model.add(item)
         print(model.summary())
 
     else:
