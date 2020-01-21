@@ -2,24 +2,42 @@ import tkinter as tk
 import time
 from .engine.input_layer import Input
 from .layers.convolutional import Conv1D, Conv2D, Conv3D, SeparableConv1D, SeparableConv2D, DepthwiseConv2D, Conv2DTranspose, Conv3DTranspose
-
+from .blocks import Inception
 GLOBAL_STRUCTURE = []
 
 class display:
     def __init__(self, master):
         self.master = master
         self.frame = tk.Frame(self.master)
-        self.button1 = tk.Button(self.frame, text = 'Create Model', width=25, command = self.model_creation)
+        self.button1 = tk.Button(self.frame, text = 'Insert Primitives', width=25, command = self.primitive_addition)
+        self.button2 = tk.Button(self.frame, text = 'Insert Blocks',     width=25, command = self.block_addition)
         self.button1.pack()
+        self.button2.pack()
         self.frame.pack()
 
 
-    def model_creation(self):
+    def primitive_addition(self):
         self.new_window = tk.Toplevel(self.master)
-        self.show = model_build(self.new_window)
+        self.show = Primitives(self.new_window)
+
+    def block_addition(self):
+        self.new_window = tk.Toplevel(self.master)
+        self.show = Blocks(self.new_window)
+
+class Blocks:
+    def __init__(self, master):
+        self.master = master
+        self.frame = tk.Frame(self.master)
+
+        tk.Button(self.frame, text='Inception',   command=self.inception).pack()
+        self.frame.pack()
 
 
-class model_build:
+    def inception(self):
+        GLOBAL_STRUCTURE.append(Inception)
+
+
+class Primitives:
     def __init__(self, master):
         self.master = master
         self.frame = tk.Frame(self.master)
@@ -208,6 +226,7 @@ def main():
     root = tk.Tk()
     face = display(root)
     root.mainloop()
+
 
     #create sequential model with GUI
     if len(GLOBAL_STRUCTURE) > 1:
