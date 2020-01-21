@@ -18,6 +18,7 @@ from . import losses
 from . import optimizers
 from . import regularizers
 from . import gui
+from . import blocks
 
 # Also importable from root
 from .layers import Input
