@@ -9,11 +9,14 @@ from .engine.input_layer import Input
 from .layers.convolutional import Conv1D, Conv2D, Conv3D, SeparableConv1D, SeparableConv2D, DepthwiseConv2D, Conv2DTranspose, Conv3DTranspose
 from .blocks import Inception, Residual, VGG, SqueezeExcite, InvertedResidual
 from .models import Sequential
+from .losses import *
+from .optimizers import *
 from .activations import *
 from .layers.core import Dense
 
 INPUT_SHAPE = []
 GLOBAL_STRUCTURE = []
+GLOBAL_LOSS = [0]
 GLOBAL_OPTIMIZER = [0]
 GLOBAL_PARAMS = [0]
 
@@ -21,6 +24,7 @@ GLOBAL_PARAMS = [0]
 class display:
     def __init__(self, master):
         self.master = master
+        self.master.title('Main Window')
         self.frame = tk.Frame(self.master)
 
         tk.Button(self.frame, text='Build Model',               width=40, height=5, command = self.build_model).grid(row=0, column=0)
@@ -51,10 +55,10 @@ class Train:
         self.LOSS  = tk.Button(self.frame, text = 'Loss'      ,              width=40, height=5, command = self.get_loss,       bg='red')
         self.LOSS.grid(row=2, column=0)
         tk.Label(self.frame, text='Epochs:')
-        self.TRAIN_PARAMS = tk.Button(self.frame, text='Training Parameters',width=40, height=5, command = self.get_params,     bg='red'))
+        self.TRAIN_PARAMS = tk.Button(self.frame, text='Training Parameters',width=40, height=5, command = self.get_params,     bg='red')
         self.TRAIN_PARAMS.grid(row=3, column=0)
-        self.TRAIN = tk.Button(self.frame, text='
-
+        self.TRAIN = tk.Button(self.frame, text='TRAIN!'                    ,width=40, height=5, command = self.train)
+        self.TRAIN.grid(row=4, column=0)
 
         tk.Button(self.frame, text = 'Exit',                    width=40, height=5, command = lambda:quit(self.master)).grid(row=5, column=0)
         self.frame.pack()
@@ -87,32 +91,35 @@ class Train:
         new_window = tk.Toplevel(self.master)
         Params(new_window, self)
 
+    def train(self):
+        model = assemble()
+        model.compile(optimizer=GLOBAL_OPTIMIZER[0], loss=GLOBAL_LOSS[0])
+        model.fit(self.X, self.y, batch_size=int(GLOBAL_PARAMS[0][0]), epochs=int(GLOBAL_PARAMS[0][1]))
+
 class Params:
     def __init__(self, master, controller):
         self.master = master
         self.master.title('Training Parameters')
+        self.controller = controller
         tk.Label(self.master, text='Batch Size:').pack()
         self.bs = tk.Entry(self.master)
-        self.bs.set(1)
         self.bs.pack()
 
         tk.Label(self.master, text='Epochs:').pack()
         self.eps = tk.Entry(self.master)
-        self.eps.set(32)
         self.eps.pack()
 
         self.button = tk.Button(self.master, text='Ok', command = self.get_params, width=20)
         self.button.pack()
 
     def get_params(self):
-        GLOBAL_PARAMS[0] = [self.bs.get(), self.eps.get()]
+        GLOBAL_PARAMS[0] = (self.bs.get(), self.eps.get())
         self.controller.TRAIN_PARAMS.configure(bg='green')
         self.master.destroy()
 
 
 
 
-from .losses import *
 class Loss:
     def __init__(self, master, controller):
         self.master = master
@@ -120,14 +127,14 @@ class Loss:
         self.controller = controller
         losses = ['Mean Squared Error', 'Mean Absolute Error', 'Mean Absolute Percentage Error', 'Mean Squared Logarithmic Errors', 'Squared Hinge', 'Hinge', 'Categorical Hinge', 'Logcosh']
         self.LOSS = {
-                "Mean Squared Error": MeanSquaredError,
-                "Mean Absolute Error": MeanAbsoluteError,
-                "Mean Absolute Percentage Error": MeanAbsolutePercentageError,
-                "Mean Squared Logarithmic Error": MeanSquaredLogarithmicError,
-                "Squared Hinge": SquaredHinge,
-                "Hinge":Hinge,
-                "Categorical Hinge": CategoricalHinge,
-                "LogCosh": LogCosh
+                "Mean Squared Error": 'mean_squared_error',
+                "Mean Absolute Error": 'mean_absolute_error',
+                "Mean Absolute Percentage Error": 'mean_absolute_percentage_error',
+                "Mean Squared Logarithmic Error": 'mean_squared_logarithmic_error',
+                "Squared Hinge": 'squared_hinge',
+                "Hinge": 'hinge',
+                "Categorical Hinge": 'categorical_hinge',
+                "LogCosh": 'logcosh'
                 }
         self.v = tk.StringVar(None, 'Mean Squared Error')
         for name in losses:
@@ -138,11 +145,10 @@ class Loss:
 
     def get_loss(self):
         opt = self.LOSS[self.v.get()]
-        GLOBAL_LOSS = opt
+        GLOBAL_LOSS[0] = opt
         self.controller.LOSS.configure(text=self.v.get(), bg='green')
         self.master.destroy()
 
-from .optimizers import *
 
 class Optimizer:
     def __init__(self, master, controller):
@@ -179,7 +185,7 @@ class Build:
     def __init__(self, master):
         self.master = master
 #        self.master.geometry("500x500")
-        self.master.title('Model Creation GUI')
+        self.master.title('Model Build')
         self.frame = tk.Frame(self.master)
         tk.Button(self.frame, text = 'Input',                   width=40, height=5, command = lambda:input_window(tk.Toplevel(self.master))).grid(row=0, column=0)
         tk.Button(self.frame, text = 'Insert Primitives',       width=40, height=5, command = lambda:Primitives  (tk.Toplevel(self.master))).grid(row=1, column=0)
