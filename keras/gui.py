@@ -19,6 +19,7 @@ GLOBAL_STRUCTURE = []
 GLOBAL_LOSS = [0]
 GLOBAL_OPTIMIZER = [0]
 GLOBAL_PARAMS = [0]
+GLOBAL_MODEL = [0]
 
 
 class display:
@@ -57,10 +58,12 @@ class Train:
         tk.Label(self.frame, text='Epochs:')
         self.TRAIN_PARAMS = tk.Button(self.frame, text='Training Parameters',width=40, height=5, command = self.get_params,     bg='red')
         self.TRAIN_PARAMS.grid(row=3, column=0)
-        self.TRAIN = tk.Button(self.frame, text='TRAIN!'                    ,width=40, height=5, command = self.train)
+        self.TRAIN = tk.Button(self.frame, text='TRAIN!',                    width=40, height=5, command = self.train)
         self.TRAIN.grid(row=4, column=0)
+        tk.Button(self.frame, text='Predict!',                               width=40, height=5, command = self.predict).grid(row=5, column=0)
 
-        tk.Button(self.frame, text = 'Exit',                    width=40, height=5, command = lambda:quit(self.master)).grid(row=5, column=0)
+
+        tk.Button(self.frame, text = 'Exit',                    width=40, height=5, command = lambda:quit(self.master)).grid(row=6, column=0)
         self.frame.pack()
 
     def get_input_file(self):
@@ -92,9 +95,17 @@ class Train:
         Params(new_window, self)
 
     def train(self):
-        model = assemble()
-        model.compile(optimizer=GLOBAL_OPTIMIZER[0], loss=GLOBAL_LOSS[0])
-        model.fit(self.X, self.y, batch_size=int(GLOBAL_PARAMS[0][0]), epochs=int(GLOBAL_PARAMS[0][1]))
+        assemble()
+        GLOBAL_MODEL[0].compile(optimizer=GLOBAL_OPTIMIZER[0], loss=GLOBAL_LOSS[0])
+        GLOBAL_MODEL[0].fit(self.X, self.y, batch_size=int(GLOBAL_PARAMS[0][0]), epochs=int(GLOBAL_PARAMS[0][1]))
+
+    def predict(self):
+        pred = GLOBAL_MODEL[0].predict([[self.X.iloc[0].to_numpy()]])
+        window = tk.Toplevel(self.master)
+        s = f'Input: {self.X.iloc[0].to_numpy()}\nPredicted: {pred}\nReal: {self.y.iloc[0]}'
+        tk.Label(window, text=s).pack()
+        window.after(5000, window.destroy)
+
 
 class Params:
     def __init__(self, master, controller):
@@ -293,15 +304,15 @@ class Primitives:
 
 
         tk.Button(self.frame, text='Dense',       command=lambda: dense(tk.Toplevel(self.master))).pack()
-        tk.Button(self.frame, text='Conv1D',      command=lambda: conv_window(tk.Toplevel(self.master, 'Conv1D'))).pack()
-        tk.Button(self.frame, text='Conv2D',      command=lambda: conv_window(tk.Toplevel(self.master, 'Conv2D'))).pack()
-        tk.Button(self.frame, text='Conv3D',      command=lambda: conv_window(tk.Toplevel(self.master, 'Conv3D'))).pack()
-        tk.Button(self.frame, text='SepConv1D',   command=lambda: conv_window(tk.Toplevel(self.master, 'SepConv1D'))).pack()
-        tk.Button(self.frame, text='SepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master, 'SepConv2D'))).pack()
+        tk.Button(self.frame, text='Conv1D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv1D')).pack()
+        tk.Button(self.frame, text='Conv2D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2D')).pack()
+        tk.Button(self.frame, text='Conv3D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3D')).pack()
+        tk.Button(self.frame, text='SepConv1D',   command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv1D')).pack()
+        tk.Button(self.frame, text='SepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv2D')).pack()
 #        self.button5= tk.Button(self.frame, text='DepConv1D',   command=self.depconv1d)
-        tk.Button(self.frame, text='DepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master, 'DepConv2D'))).pack()
-        tk.Button(self.frame, text='Conv2DTran',  command=lambda: conv_window(tk.Toplevel(self.master, 'Conv2DTrans'))).pack()
-        tk.Button(self.frame, text='Conv3DTran',  command=lambda: conv_window(tk.Toplevel(self.master, 'Conv3DTrans'))).pack()
+        tk.Button(self.frame, text='DepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master), 'DepConv2D')).pack()
+        tk.Button(self.frame, text='Conv2DTran',  command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2DTrans')).pack()
+        tk.Button(self.frame, text='Conv3DTran',  command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3DTrans')).pack()
 
         self.frame.pack()
 
@@ -467,7 +478,7 @@ def assemble():
     else:
         print('nothing to display')
 
-    return model
+    GLOBAL_MODEL[0] = model
 
 def main():
     root = tk.Tk()
@@ -477,9 +488,10 @@ def main():
 
 
     print(GLOBAL_STRUCTURE)
+    print(GLOBAL_MODEL)
     #create sequential model with GUI
-    model = assemble()
-    model.summary()
+#    model = assemble()
+#    model.summary()
 
 if __name__ == '__main__':
     main()
