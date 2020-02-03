@@ -1,6 +1,6 @@
 from .layers import Layer, LeakyReLU, BatchNormalization
 from .layers.pooling import GlobalAveragePooling2D
-from .layers.convolutional import Conv2D, MaxPooling2D, SeparableConv2D
+from .layers.convolutional import Conv2D, MaxPooling2D, SeparableConv2D, DepthwiseConv2D
 from .layers.merge import Concatenate, Add, Multiply
 from .layers.core import Dense
 
@@ -115,6 +115,38 @@ class SqueezeExcite(Layer):
         out = Multiply()([x, x3])
 
         return out
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], input_shape[1], input_shape[2], input_shape[3])
+
+
+
+class InvertedResidual(Layer):
+    """
+    Implementation of Inverted Residual as seen in Google's MobileNet. 
+    This implementation is a reverse bottleneck along with a residual
+    """
+    def __init__(self, **kwargs):
+        super(InvertedResidual, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.kernel = self.add_weight(name='kernel5',
+                                    shape=(input_shape[1], input_shape[2], input_shape[3]),
+                                    initializer='uniform',
+                                    trainable=True)
+        super(InvertedResidual, self).build(input_shape)
+
+    def call(self, x):
+        #hyperparameterized by squeeze and excite channel shape
+        h,w,c = x.shape[1:]
+        squeeze = c
+        expand = c * 4
+
+        m = Conv2D(expand, (1,1), activation='relu')(x)
+        m = DepthwiseConv2D((3,3), activation='relu', padding='same')(m)
+        m = Conv2D(squeeze, (1,1), activation='relu')(m)
+
+        return Add()([m, x])
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[1], input_shape[2], input_shape[3])
