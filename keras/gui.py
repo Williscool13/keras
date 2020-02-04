@@ -303,16 +303,16 @@ class Primitives:
         self.frame = tk.Frame(self.master)
 
 
-        tk.Button(self.frame, text='Dense',       command=lambda: dense(tk.Toplevel(self.master))).pack()
-        tk.Button(self.frame, text='Conv1D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv1D')).pack()
-        tk.Button(self.frame, text='Conv2D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2D')).pack()
-        tk.Button(self.frame, text='Conv3D',      command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3D')).pack()
-        tk.Button(self.frame, text='SepConv1D',   command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv1D')).pack()
-        tk.Button(self.frame, text='SepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv2D')).pack()
+        tk.Button(self.frame, text='Dense',       width=30, command=lambda: dense(tk.Toplevel(self.master))).pack()
+        tk.Button(self.frame, text='Conv1D',      width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv1D')).pack()
+        tk.Button(self.frame, text='Conv2D',      width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2D')).pack()
+        tk.Button(self.frame, text='Conv3D',      width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3D')).pack()
+        tk.Button(self.frame, text='SepConv1D',   width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv1D')).pack()
+        tk.Button(self.frame, text='SepConv2D',   width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'SepConv2D')).pack()
 #        self.button5= tk.Button(self.frame, text='DepConv1D',   command=self.depconv1d)
-        tk.Button(self.frame, text='DepConv2D',   command=lambda: conv_window(tk.Toplevel(self.master), 'DepConv2D')).pack()
-        tk.Button(self.frame, text='Conv2DTran',  command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2DTrans')).pack()
-        tk.Button(self.frame, text='Conv3DTran',  command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3DTrans')).pack()
+        tk.Button(self.frame, text='DepConv2D',   width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'DepConv2D')).pack()
+        tk.Button(self.frame, text='Conv2DTran',  width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2DTrans')).pack()
+        tk.Button(self.frame, text='Conv3DTran',  width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3DTrans')).pack()
 
         self.frame.pack()
 
@@ -480,7 +480,7 @@ def assemble():
 
     GLOBAL_MODEL[0] = model
 
-def main():
+def GUI():
     root = tk.Tk()
     face = display(root)
     root.mainloop()
@@ -493,5 +493,4 @@ def main():
 #    model = assemble()
 #    model.summary()
 
-if __name__ == '__main__':
-    main()
+
