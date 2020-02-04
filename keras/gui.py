@@ -313,6 +313,7 @@ class Primitives:
         tk.Button(self.frame, text='DepConv2D',   width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'DepConv2D')).pack()
         tk.Button(self.frame, text='Conv2DTran',  width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv2DTrans')).pack()
         tk.Button(self.frame, text='Conv3DTran',  width=30, command=lambda: conv_window(tk.Toplevel(self.master), 'Conv3DTrans')).pack()
+        tk.Button(self.frame, text = 'Exit',      width=40, height=5, command = lambda:quit(self.master)).pack()
 
         self.frame.pack()
 
