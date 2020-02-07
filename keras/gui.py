@@ -236,11 +236,8 @@ class ViewModel:
 
         model = assemble()
         if model:
-            temp = []
-            model.summary(print_fn=lambda x: temp.append(x))
-            short_model_summary = "\n".join(temp)
             #self.master.after(1000)
-            tk.Label(self.frame, text=short_model_summary, width=50, height=50, anchor='n').pack()
+            tk.Label(self.frame, text=model, width=50, height=50, anchor='n').pack()
             tk.Button(self.frame, text = 'Close', width=40, height=5, command = lambda:quit(self.master)).pack()
         else:
             tk.Label(self.frame, text='No model to display!', width=40, height=5).pack()
@@ -480,6 +477,16 @@ def assemble():
         print('nothing to display')
 
     GLOBAL_MODEL[0] = model
+
+
+    if model:
+        temp = []
+        model.summary(print_fn=lambda x: temp.append(x))
+        short_model_summary = "\n".join(temp)
+        return short_model_summary
+    else:
+        return None
+
 
 def GUI():
     root = tk.Tk()
